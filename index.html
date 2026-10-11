@@ -3,8 +3,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منظومة الاستعلام + CT Portal</title>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
@@ -78,7 +77,7 @@
             display: block;
         }
 
-        /* ===== أنماط صفحة البلاغات (المحفوظة كما هي) ===== */
+        /* ===== أنماط صفحة البلاغات ===== */
         .header-date {
             text-align: right;
             font-size: 13px;
@@ -745,6 +744,16 @@
             background-color: #0e7490 !important;
             border-color: #0e7490 !important;
         }
+        /* ===== زر تحصيل رسوم ===== */
+        .fees-btn {
+            background-color: #dc2626 !important;
+            color: white !important;
+            border-color: #dc2626 !important;
+        }
+        .fees-btn:hover {
+            background-color: #b91c1c !important;
+            border-color: #b91c1c !important;
+        }
 
         .card-footer {
             display: flex;
@@ -960,7 +969,7 @@
             direction: rtl;
         }
 
-        /* ===== أنماط صفحة CT Portal (التبويب الثاني) ===== */
+        /* ===== أنماط صفحة CT Portal ===== */
         .ct-iframe-container {
             width: 100%;
             height: 80vh;
@@ -1020,18 +1029,16 @@
 
 <div class="container">
 
-    <!-- ===== شريط التبويبات الرئيسي (صفحتين) ===== -->
+    <!-- ===== شريط التبويبات الرئيسي ===== -->
     <div class="tabs-bar" id="tabsBar">
         <button class="tab-btn active" data-tab="tabReports">📊 البلاغات</button>
         <button class="tab-btn" data-tab="tabCT">🌐 CT Portal</button>
     </div>
 
-    <!-- =========================================================
-    التبويب الأول: صفحة البلاغات
-    ========================================================= -->
+    <!-- ===== التبويب الأول: صفحة البلاغات ===== -->
     <div id="tabReports" class="tab-content active">
 
-        <div class="header-date">تاريخ تحديث النظام: <span id="generationDate">2026-10-11 (الساعة 08:43)</span></div>
+        <div class="header-date">تاريخ تحديث النظام: <span id="generationDate">2026-10-11 (الساعة 12:32)</span></div>
 
         <h2>منظومة الاستعلام الآمن وعرض بلاغات العملاء</h2>
 
@@ -1132,9 +1139,7 @@
         </div>
     </div>
 
-    <!-- =========================================================
-    التبويب الثاني: صفحة CT Portal (iframe)
-    ========================================================= -->
+    <!-- ===== التبويب الثاني: صفحة CT Portal ===== -->
     <div id="tabCT" class="tab-content ct-container">
         <div class="ct-header">
             <h3>🌐 CT Portal — منصة إدارة العملاء</h3>
@@ -1149,7 +1154,7 @@
 
 </div><!-- .container -->
 
-<!-- ===== Modal (للبلاغات) ===== -->
+<!-- ===== Modal ===== -->
 <div class="modal-overlay" id="actionModal">
     <div class="modal-box">
         <h3 id="modalTitle">📧 إرسال البلاغ</h3>
@@ -1164,7 +1169,7 @@
 
 <script>
     // =========================================================
-    // دوال صفحة البلاغات (المحفوظة كما هي)
+    // دوال صفحة البلاغات
     // =========================================================
 
     const customersDatabase = [
@@ -323588,7 +323593,7 @@
 
     const BACKOFFICE_CC = 'SentTOBackOffice@unionaire.com';
 
-    // ===== تم تعديل الإيميلات حسب الطلب + إضافة الدعم الفني =====
+    // ===== الإيميلات =====
     const emailMap = {
         'الصعيد': { to: ['asaad.ebiary@unionaire.com', 'Mohamed.Korany@unionaire.com'], cc: [] },
         'القاهرة 1': { to: ['Eslam.Mousa@unionaire.com', 'ibrahim.abdeltwab@unionaire.com'], cc: [] },
@@ -323600,7 +323605,7 @@
         'الاستبدالات': { to: ['tarek.saber@unionaire.com'], cc: ['ahmed.rashed@unionaire.com'] },
         'قطع الغيار': { to: ['c.s.spare.parts.team@unionaire.com'], cc: ['ahmed.abdelnabi@unionaire.com', 'ahmed.rashed@unionaire.com'] },
         'الشكاوي': { to: ['sara.mamdouh@unionaire.com'], cc: ['mohamed.wadea@unionaire.com'] },
-'ورشة المجمع': { to: ['abdelgawad.abdelnabi@unionaire.com', 'ahmed.abdelgawad@unionaire.com'], cc: ['islam.wageeh@unionaire.com', 'Elhusseini.Hamed@unionaire.com'] },
+        'ورشة المجمع': { to: ['abdelgawad.abdelnabi@unionaire.com', 'ahmed.abdelgawad@unionaire.com'], cc: ['islam.wageeh@unionaire.com', 'Elhusseini.Hamed@unionaire.com'] },
         'الكول سنتر': { to: ['ali.adel@unionaire.com'], cc: ['awad.shahat@unionaire.com'] },
         'مدن القناه': { to: ['Eslam.Mousa@unionaire.com'], cc: ['ibrahim.abdeltwab@unionaire.com'] },
         'تقارير واعتراضات': { to: ['abdrahman.emam@unionaire.com', 'shady.ahmed@unionaire.com'], cc: [] },
@@ -323615,6 +323620,11 @@
         'الدعم الفني': { 
             to: ['mohamed.shahat@unionaire.com'], 
             cc: ['islam.wageeh@unionaire.com', BACKOFFICE_CC] 
+        },
+        // ✅ قسم تحصيل رسوم الجديد
+        'تحصيل رسوم': { 
+            to: ['heba.ahmed@unionaire.com', 'Mohamed.Gamaal@unionaire.com'], 
+            cc: ['Omar.Fathy@unionaire.com'] 
         }
     };
 
@@ -323638,10 +323648,10 @@
     // ===== قائمة الأقسام للـ Quick Form =====
     const deptDisplayNames = ['القاهرة 1', 'القاهرة 2', 'الجيزة', 'الدلتا', 'الصعيد', 'الاسكندرية', 'اللوجيستك',
         'الاستبدالات', 'قطع الغيار', 'الشكاوي', 'ورشة المجمع', 'الكول سنتر', 'مدن القناه', 'تقارير واعتراضات',
-        'شكوي ضد موظف متابعه او فني صيانة', 'شكوي ضد موظف كول سنتر', 'الدعم الفني'
+        'شكوي ضد موظف متابعه او فني صيانة', 'شكوي ضد موظف كول سنتر', 'الدعم الفني', 'تحصيل رسوم'
     ];
 
-    // ===== خريطة ربط نوع الإصلاح بالقطاع المسؤول (كما حددتها) =====
+    // ===== خريطة ربط نوع الإصلاح بالقطاع المسؤول =====
     const repairTypeToSector = {
         'Workshop': 'القطاع + ورشة المجمع',
         'Voucher': 'الاستبدالات',
@@ -323674,7 +323684,6 @@
         'Charge Appr': 'الدعم الفني'
     };
 
-    // ===== دالة لجلب القطاع من نوع الإصلاح =====
     function getSectorFromRepairType(repairType) {
         if (!repairType) return null;
         const cleanType = String(repairType).trim();
@@ -323689,26 +323698,24 @@
         return null;
     }
 
-    // ===== دالة لجلب الأزرار المطلوبة بناءً على Repair Type =====
     function getActionButtonsFromRepairType(repairType, detectedDept) {
-        const buttons = []; // array of {dept, label, className, style}
+        const buttons = [];
         const sector = getSectorFromRepairType(repairType);
         
         if (!sector) return buttons;
         
-        // تحليل القطاع وإضافة الأزرار
         const sectorParts = sector.split('+').map(s => s.trim());
         
         sectorParts.forEach(part => {
             if (part === 'القطاع') {
-                // إضافة القطاع المكتشف (القاهرة 1/2 الجيزة الدلتا الصعيد الاسكندرية مدن القناه)
                 if (detectedDept && detectedDept !== 'اللوجيستك' && detectedDept !== 'الاستبدالات' && 
                     detectedDept !== 'قطع الغيار' && detectedDept !== 'الشكاوي' && 
                     detectedDept !== 'ورشة المجمع' && detectedDept !== 'الكول سنتر' &&
                     detectedDept !== 'مدن القناه' && detectedDept !== 'تقارير واعتراضات' &&
                     detectedDept !== 'الدعم الفني' && 
                     detectedDept !== 'شكوي ضد موظف متابعه او فني صيانة' &&
-                    detectedDept !== 'شكوي ضد موظف كول سنتر') {
+                    detectedDept !== 'شكوي ضد موظف كول سنتر' &&
+                    detectedDept !== 'تحصيل رسوم') {
                     const btnClass = (detectedDept === 'مدن القناه') ? 'action-btn canal-btn' : 'action-btn send-btn';
                     buttons.push({
                         dept: detectedDept,
@@ -323718,47 +323725,17 @@
                     });
                 }
             } else if (part === 'ورشة المجمع') {
-                buttons.push({
-                    dept: 'ورشة المجمع',
-                    label: '📧 ورشة المجمع',
-                    className: 'action-btn send-btn',
-                    style: ''
-                });
+                buttons.push({ dept: 'ورشة المجمع', label: '📧 ورشة المجمع', className: 'action-btn send-btn', style: '' });
             } else if (part === 'الاستبدالات') {
-                buttons.push({
-                    dept: 'الاستبدالات',
-                    label: '📧 الاستبدالات',
-                    className: 'action-btn send-btn',
-                    style: ''
-                });
+                buttons.push({ dept: 'الاستبدالات', label: '📧 الاستبدالات', className: 'action-btn send-btn', style: '' });
             } else if (part === 'قطع الغيار') {
-                buttons.push({
-                    dept: 'قطع الغيار',
-                    label: '📧 قطع الغيار',
-                    className: 'action-btn send-btn',
-                    style: ''
-                });
+                buttons.push({ dept: 'قطع الغيار', label: '📧 قطع الغيار', className: 'action-btn send-btn', style: '' });
             } else if (part === 'الاعتراضات والتقارير') {
-                buttons.push({
-                    dept: 'تقارير واعتراضات',
-                    label: '📋 تقارير واعتراضات',
-                    className: 'action-btn reports-btn',
-                    style: ''
-                });
+                buttons.push({ dept: 'تقارير واعتراضات', label: '📋 تقارير واعتراضات', className: 'action-btn reports-btn', style: '' });
             } else if (part === 'الوجيستك' || part === 'اللوجيستك') {
-                buttons.push({
-                    dept: 'اللوجيستك',
-                    label: '📧 اللوجيستك',
-                    className: 'action-btn send-btn',
-                    style: ''
-                });
+                buttons.push({ dept: 'اللوجيستك', label: '📧 اللوجيستك', className: 'action-btn send-btn', style: '' });
             } else if (part === 'الدعم الفني') {
-                buttons.push({
-                    dept: 'الدعم الفني',
-                    label: '🛠️ الدعم الفني',
-                    className: 'action-btn support-btn',
-                    style: ''
-                });
+                buttons.push({ dept: 'الدعم الفني', label: '🛠️ الدعم الفني', className: 'action-btn support-btn', style: '' });
             }
         });
         
@@ -323876,6 +323853,8 @@
                     btn.className = 'action-btn complaint-btn';
                 } else if (dept === 'الدعم الفني') {
                     btn.className = 'action-btn support-btn';
+                } else if (dept === 'تحصيل رسوم') {
+                    btn.className = 'action-btn fees-btn';
                 } else {
                     btn.className = 'action-btn send-btn';
                 }
@@ -323886,6 +323865,8 @@
                     label = '⚠️ شكوي ضد موظف كول سنتر';
                 else if (dept === 'الدعم الفني')
                     label = '🛠️ الدعم الفني';
+                else if (dept === 'تحصيل رسوم')
+                    label = '💰 مخالفة تحصيل رسوم';
                 else 
                     label = '📧 ' + dept;
                 btn.textContent = label;
@@ -323996,8 +323977,8 @@
             city.includes('نجع') || city.includes('ناقة') ||
             city.includes('أخميم') || city.includes('Akhmim') ||
             city.includes('كوم') || city.includes('كوم امبو') || city.includes('كوم امب') || city.includes('Kom Ombo') || city.includes('Kom Ambo') ||
-            city.includes('ابو سمبل') || city.includes('ابو سمبل') || city.includes('Abu') ||
-            city.includes('ادفو') || city.includes('ادفو') || city.includes('Edfu') ||
+            city.includes('ابو سمبل') || city.includes('Abu') ||
+            city.includes('ادفو') || city.includes('Edfu') ||
             city.includes('دار السلام') || city.includes('Dar') ||
             city.includes('مطاي') || city.includes('Matai') ||
             city.includes('ابو تيج') || city.includes('Abu Tig') ||
@@ -324007,7 +323988,6 @@
             city.includes('قرية') || city.includes('قرى') ||
             city.includes('نجع حماد') || city.includes('Nag Hammadi') ||
             city.includes('دشنا') || city.includes('Deshna') ||
-            city.includes('قوص') || city.includes('Qus') ||
             city.includes('قفت') || city.includes('Qift') ||
             city.includes('الشناينة') || city.includes('Shanayna')) {
             return 'الصعيد';
@@ -324118,7 +324098,13 @@
         } else {
             const row = customersDatabase[modalData.index];
             if (!row) return;
-            subjectLine = `${modalData.customerName} - ${modalData.ticketNo}`;
+            
+            // ✅ عنوان خاص لقسم تحصيل رسوم
+            if (modalData.dept === 'تحصيل رسوم') {
+                subjectLine = `تحصيل رسوم - ${modalData.ticketNo}`;
+            } else {
+                subjectLine = `${modalData.customerName} - ${modalData.ticketNo}`;
+            }
             textToCopy = `📋 بيانات العميل:\n`;
             textToCopy += `----------------------------------------\n`;
             for (let key in columnLabels) {
@@ -324199,7 +324185,13 @@
         } else {
             const row = customersDatabase[modalData.index];
             if (!row) return;
-            subjectLine = `${modalData.customerName} - ${modalData.ticketNo}`;
+            
+            // ✅ عنوان خاص لقسم تحصيل رسوم
+            if (modalData.dept === 'تحصيل رسوم') {
+                subjectLine = `تحصيل رسوم - ${modalData.ticketNo}`;
+            } else {
+                subjectLine = `${modalData.customerName} - ${modalData.ticketNo}`;
+            }
             bodyText = `📋 بيانات العميل:\n`;
             bodyText += `----------------------------------------\n`;
             for (let key in columnLabels) {
@@ -324928,18 +324920,17 @@
                 }
                 bodyHTML += closureHTML;
 
-                // ===== بناء الأزرار: 4 ثابتة + الديناميكية =====
+                // ===== بناء الأزرار: 5 ثابتة + الديناميكية =====
                 let actionButtonsHTML = `<div class="action-bar">`;
                 
-                // 1) الأزرار الثابتة دائماً (4 أزرار)
+                // 1) الأزرار الثابتة دائماً (5 أزرار)
                 actionButtonsHTML += `<button class="action-btn important-copy-btn" onclick="copyCardDataImportant(${realIndex})">📋 نسخ البيانات المهمة</button>`;
                 actionButtonsHTML += `<button class="action-btn complaint-btn" onclick="openModal(${realIndex}, 'شكوي ضد موظف متابعه او فني صيانة')">⚠️ شكوي ضد موظف متابعة أو فني صيانة</button>`;
                 actionButtonsHTML += `<button class="action-btn complaint-btn" onclick="openModal(${realIndex}, 'شكوي ضد موظف كول سنتر')">⚠️ شكوي ضد موظف كول سنتر</button>`;
                 actionButtonsHTML += `<button class="action-btn send-btn" onclick="openModal(${realIndex}, 'الشكاوي')">📧 الشكاوي</button>`;
+                actionButtonsHTML += `<button class="action-btn fees-btn" onclick="openModal(${realIndex}, 'تحصيل رسوم')">💰 مخالفة تحصيل رسوم</button>`;
                 
-                // 2) الأزرار الديناميكية:
-                //    - لو Repairs Status = Need TL Checked (مطلوب مراجعة التيم ليدر): زر القطاع فقط
-                //    - غير كده: الأزرار المرتبطة بـ Repair Type
+                // 2) الأزرار الديناميكية
                 const isNeedTL = /need\s*tl\s*check/i.test(repairStatus);
                 let dynamicButtons = [];
 
