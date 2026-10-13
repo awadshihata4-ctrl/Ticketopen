@@ -1038,7 +1038,7 @@
     <!-- ===== التبويب الأول: صفحة البلاغات ===== -->
     <div id="tabReports" class="tab-content active">
 
-        <div class="header-date">تاريخ تحديث النظام: <span id="generationDate">2026-10-12 (الساعة 22:50)</span></div>
+        <div class="header-date">تاريخ تحديث النظام: <span id="generationDate">2026-10-13 (الساعة 12:21)</span></div>
 
         <h2>منظومة الاستعلام الآمن وعرض بلاغات العملاء</h2>
 
@@ -369888,7 +369888,8 @@
         'ورشة المجمع': { to: ['abdelgawad.abdelnabi@unionaire.com', 'ahmed.abdelgawad@unionaire.com'], cc: ['islam.wageeh@unionaire.com', 'Elhusseini.Hamed@unionaire.com'] },
         'الكول سنتر': { to: ['ali.adel@unionaire.com'], cc: ['awad.shahat@unionaire.com'] },
         'مدن القناه': { to: ['Eslam.Mousa@unionaire.com'], cc: ['ibrahim.abdeltwab@unionaire.com'] },
-        'تقارير واعتراضات': { to: ['abdrahman.emam@unionaire.com', 'shady.ahmed@unionaire.com'], cc: [] },
+        // ✅ قسم تقارير واعتراضات: شادي فقط في To
+        'تقارير واعتراضات': { to: ['shady.ahmed@unionaire.com'], cc: [] },
         'شكوي ضد موظف متابعه او فني صيانة': { 
             to: ['heba.ahmed@unionaire.com'], 
             cc: ['ali.adel@unionaire.com', 'awad.shahat@unionaire.com', BACKOFFICE_CC] 
@@ -369906,16 +369907,23 @@
             ], 
             cc: ['islam.wageeh@unionaire.com', BACKOFFICE_CC] 
         },
-        // ✅ قسم تحصيل رسوم الجديد
+        // ✅ قسم تحصيل رسوم
         'تحصيل رسوم': { 
             to: ['heba.ahmed@unionaire.com', 'Mohamed.Gamaal@unionaire.com'], 
             cc: ['Omar.Fathy@unionaire.com'] 
         }
     };
 
+    // ✅ دالة CC: قسم تقارير واعتراضات = SentTOBackOffice فقط
     function getEmailCC(dept) {
         const info = emailMap[dept];
         if (!info) return [];
+
+        // ✅ استثناء: قسم تقارير واعتراضات → BackOffice فقط
+        if (dept === 'تقارير واعتراضات') {
+            return [BACKOFFICE_CC];
+        }
+
         const ccList = [BACKOFFICE_CC];
         if (info.cc && info.cc.length > 0) {
             info.cc.forEach(email => {
@@ -369983,6 +369991,7 @@
         return null;
     }
 
+    // ✅ دالة بناء الأزرار الديناميكية
     function getActionButtonsFromRepairType(repairType, detectedDept) {
         const buttons = [];
         const sector = getSectorFromRepairType(repairType);
@@ -369993,6 +370002,10 @@
         
         sectorParts.forEach(part => {
             if (part === 'القطاع') {
+                // ✅ لا تضف زر القطاع إذا كان نوع الإصلاح من نوع التقارير والاعتراضات
+                const isReportType = /Tec\.Report|Replacement Report|Phone Reject|Internal Leak|Customer Rejection|تقرير فني إستبدال/i.test(String(repairType || ''));
+                if (isReportType) return;
+
                 if (detectedDept && detectedDept !== 'اللوجيستك' && detectedDept !== 'الاستبدالات' && 
                     detectedDept !== 'قطع الغيار' && detectedDept !== 'الشكاوي' && 
                     detectedDept !== 'ورشة المجمع' && detectedDept !== 'الكول سنتر' &&
@@ -370140,6 +370153,8 @@
                     btn.className = 'action-btn support-btn';
                 } else if (dept === 'تحصيل رسوم') {
                     btn.className = 'action-btn fees-btn';
+                } else if (dept === 'تقارير واعتراضات') {
+                    btn.className = 'action-btn reports-btn';
                 } else {
                     btn.className = 'action-btn send-btn';
                 }
@@ -370152,6 +370167,8 @@
                     label = '🛠️ الدعم الفني';
                 else if (dept === 'تحصيل رسوم')
                     label = '💰 مخالفة تحصيل رسوم';
+                else if (dept === 'تقارير واعتراضات')
+                    label = '📋 تقارير واعتراضات';
                 else 
                     label = '📧 ' + dept;
                 btn.textContent = label;
@@ -370283,7 +370300,13 @@
         return null;
     }
 
+    // ✅ دالة openModal مع تطبيع اسم القسم
     function openModal(index, dept) {
+        // ✅ تطبيع اسم القسم: أي صيغة "اعتراضات/تقارير" → 'تقارير واعتراضات'
+        if (dept === 'الاعتراضات والتقارير' || dept === 'تقارير و اعتراضات' || dept === 'تقارير وإعتراضات') {
+            dept = 'تقارير واعتراضات';
+        }
+
         const row = customersDatabase[index];
         if (!row) return;
 
