@@ -225,7 +225,7 @@
 
     <!-- ===== التبويب الأول: صفحة البلاغات ===== -->
     <div id="tabReports" class="tab-content active">
-        <div class="header-date">تاريخ تحديث النظام: <span id="generationDate">2026-10-19 (الساعة 08:33)</span></div>
+        <div class="header-date">تاريخ تحديث النظام: <span id="generationDate">2026-10-19 (الساعة 10:51)</span></div>
         <h2>منظومة الاستعلام الآمن وعرض بلاغات العملاء</h2>
 
         <div class="admin-card" id="adminPanel" style="display: block;">
@@ -342122,40 +342122,17 @@
     }
 
     // =========================================================
-    // ✅ دالة بناء النص المخصصة لزر "نسخ البيانات المهمة" فقط
+    // ✅ دالة بناء النص المختصر (مع خيار إضافة ملاحظات الإغلاق)
     // =========================================================
-    function buildImportantDataText(row) {
+    function buildImportantDataText(row, options = {}) {
+        const { includeClosureNotes = false } = options;
         let text = "";
-        if (hasValue(row["col0"])) text += `الاسم: ${row["col0"]}\n`;
-        if (hasValue(row["col1"])) text += `الجوال: ${row["col1"]}\n`;
-        if (hasValue(row["col2"])) text += `موبايل 1: ${row["col2"]}\n`;
-        if (hasValue(row["col3"])) text += `موبايل 2: ${row["col3"]}\n`;
-        if (hasValue(row["col4"])) text += `موبايل 3: ${row["col4"]}\n`;
-        if (hasValue(row["col5"])) text += `لاند لاين 1: ${row["col5"]}\n`;
-        if (hasValue(row["col6"])) text += `لاند لاين 2: ${row["col6"]}\n`;
-        if (hasValue(row["col11"])) text += `المحافظة: ${row["col11"]}\n`;
-        if (hasValue(row["col19"])) text += `المدينة: ${row["col19"]}\n`;
-        if (hasValue(row["col21"])) text += `العنوان: ${row["col21"]}\n`;
 
-        if (hasValue(row["col7"])) text += `رقم البلاغ: #${row["col7"]}\n`;
-        if (hasValue(row["col20"])) text += `نوع التذكرة: ${row["col20"]}\n`;
-        if (hasValue(row["col9"])) text += `تاريخ الاتصال: ${row["col9"]}\n`;
-
-        if (hasValue(row["col8"])) text += `رقم الإصلاح: ${row["col8"]}\n`;
-        if (hasValue(row["col16"])) {
-            const days = calculateDaysDifference(row["col16"]);
-            text += `📅 تاريخ الإنشاء: ${row["col16"]} (${days})\n`;
-        }
-        if (hasValue(row["col10"])) text += `جدول الإصلاح: ${row["col10"]}\n`;
+        if (hasValue(row["col7"]))  text += `رقم البلاغ: #${row["col7"]}\n`;
         if (hasValue(row["col17"])) text += `نوع الإصلاح: ${row["col17"]}\n`;
         if (hasValue(row["col12"])) text += `حالة الإصلاح: ${row["col12"]}\n`;
         if (hasValue(row["col13"])) text += `القطاع: ${row["col13"]}\n`;
         if (hasValue(row["col18"])) text += `مركز الخدمة: ${row["col18"]}\n`;
-
-        if (hasValue(row["col14"])) text += `المنتج: ${row["col14"]}\n`;
-        if (hasValue(row["col15"])) text += `الموديل: ${row["col15"]}\n`;
-        if (hasValue(row["col22"])) text += `🔢 الرقم التسلسلي: ${row["col22"]}\n`;
-        if (hasValue(row["col23"])) text += `📋 تاريخ الإصدار: ${row["col23"]}\n`;
 
         if (row["col9"]) {
             const callDiff = calculateDaysDifference(row["col9"]);
@@ -342166,10 +342143,31 @@
             if (repairDiff !== null) text += `🔧 زمن خدمة الإصلاح: ${repairDiff}\n`;
         }
 
+        // ✅ إضافة ملاحظات الإغلاق بس (بدون أي حاجة تانية)
+        if (includeClosureNotes) {
+            const closureNotes = getClosureNotes(row["col7"] || '');
+            text += `\n📝 ملاحظات الإغلاق:\n`;
+            if (closureNotes.length > 0) {
+                closureNotes.forEach((note, idx) => {
+                    const noteText = note['Notes'] || note['Note Cr'] || '';
+                    const noteBy = note['Note By'] || '';
+                    const noteDate = note['Note Cr'] || note['Call Date 2'] || '';
+                    if (noteText) {
+                        text += `${idx + 1}. ${noteText}`;
+                        if (noteBy) text += ` (${noteBy})`;
+                        if (noteDate) text += ` [${noteDate}]`;
+                        text += `\n`;
+                    }
+                });
+            } else {
+                text += `لا توجد ملاحظات إغلاق مسجلة لهذا البلاغ\n`;
+            }
+        }
+
         return text;
     }
 
-    // ✅ دالة موحّدة لبناء النص (للمعاينة والإرسال)
+    // ✅ دالة موحّدة لبناء النص (للمعاينة فقط)
     function buildFormattedDataText(row, options = {}) {
         const { includeComplaint = false, complaintText = '', includeRepairNotes = false, includeClosureNotes = false, includeEmails = false, toList = '', ccList = '', dept = '' } = options;
         let text = "";
@@ -342226,7 +342224,7 @@
                     'Replacement Report': 'تقرير فني إستبدال\nبيتم متابعة العميل خلال 3 ايام من Repair Cre', 'Phone Reject/Repair-Price': 'بيتم متابعة العميل خلال 3 ايام من Repair Cre', 'Tec.Report': 'بيتم متابعة العميل خلال 3 ايام من Repair Cre', 'Internal Leak Follow.Up': 'بيتم متابعة العميل خلال 3 ايام من Repair Cre', 'Customer Rejection F.Up': 'بيتم متابعة العميل خلال 3 ايام من Repair Cre',
                     'Panel Workshop': 'بيتم متابعة الانتهاء من جهاز العميل بالورشة خلال 15 يوم من Repair Cre', 'Workshop': 'بيتم متابعة الانتهاء من جهاز العميل بالورشة خلال 15 يوم من Repair Cre', 'Spare Part Required': 'مدة توفير قطع الغيار 3 ايام من Repair Cre',
                     'DLR Product Exchange': '( لايتم ابلاغ العميل بالزيارة والبلاغ مازال Working )\nفي حاله printed\nالتنفيذ خلال من 3ايام الي 10 أيام\nRepair Sch', 'UC Product Exchange': '( لايتم ابلاغ العميل بالزيارة والبلاغ مازال Working )\nفي حاله printed\nالتنفيذ خلال من 3ايام الي 10 أيام\nRepair Sch', 'Product Exchange': '( لايتم ابلاغ العميل بالزيارة والبلاغ مازال Working )\nفي حاله printed\nالتنفيذ خلال من 3ايام الي 10 أيام\nRepair Sch', 'Refund Product': '( لايتم ابلاغ العميل بالزيارة والبلاغ مازال Working )\nفي حاله printed\nالتنفيذ خلال من 3ايام الي 10 أيام\nRepair Sch', 'Logistics Transfer': '( لايتم ابلاغ العميل بالزيارة والبلاغ مازال Working )\nفي حاله printed\nالتنفيذ خلال من 3ايام الي 10 أيام\nRepair Sch',
-                    'Refund Product Required': 'بيتم توفير المنتج للعميل خلال 15 ايام من Repair Cre', 'Product Required': 'بيتم توفير المنتج للعميل خلال 15 ايام من Repair Cre', 'Charge approval': 'بيتم الموافقه علي التغير أولا خلال 48 ساعه بحد اقصي من Repair Cre', 'Internal Cust. Receive': 'لا يوجد ملاحظات'
+                    'Refund Product Required': 'بيتم توفير المنتج للعميل خلال 15 ايام من Repair Cre', 'Product Required': 'بيتم توفير المنتج للعميل خلال 15 ايام من Repair Cre', 'Charge approval': 'بيتم الموافقه علي التغير أولا خلال 48 ساعه بحد اقصي من Repair Cre', 'Charge Appr': 'بيتم الموافقه علي التغير أولا خلال 48 ساعه بحد اقصي من Repair Cre', 'Internal Cust. Receive': 'لا يوجد ملاحظات'
                 };
                 let matchedNote = '';
                 if (notesMap[repairType] !== undefined) matchedNote = notesMap[repairType];
@@ -342291,6 +342289,7 @@
         document.getElementById('actionModal').style.display = 'none';
     }
 
+    // ✅ نسخ البيانات: النص المختصر + ملاحظات الإغلاق + الإيميلات
     function modalCopy() {
         let textToCopy = "";
         let subjectLine = "";
@@ -342304,9 +342303,9 @@
             if (!row) return;
             subjectLine = (modalData.dept === 'تحصيل رسوم') ? `مخالفة تحصيل رسوم - ${modalData.customerName} - ${modalData.ticketNo}` : `${modalData.customerName} - ${modalData.ticketNo}`;
             
-            textToCopy = `📋 بيانات العميل:\n========================================\n\n` + buildFormattedDataText(row, {
-                includeComplaint: true, complaintText: modalData.complaintText, includeRepairNotes: true, includeClosureNotes: true, includeEmails: true, toList: modalData.toList, ccList: modalData.ccList, dept: modalData.dept
-            });
+            // ✅ النص المختصر + ملاحظات الإغلاق + الإيميلات
+            textToCopy = buildImportantDataText(row, { includeClosureNotes: true })
+                + `\n📧 القسم: ${modalData.dept}\nTo: ${modalData.toList}\nCC: ${modalData.ccList}\n`;
         }
 
         function showSuccess() { alert('✅ تم نسخ البيانات والإيميلات بنجاح!'); closeModal(); }
@@ -342314,6 +342313,7 @@
         else fallbackCopy(textToCopy, showSuccess);
     }
 
+    // ✅ الإرسال: النص المختصر + ملاحظات الإغلاق فقط
     function modalSend() {
         let bodyText = "";
         let subjectLine = "";
@@ -342327,9 +342327,8 @@
             if (!row) return;
             subjectLine = (modalData.dept === 'تحصيل رسوم') ? `مخالفة تحصيل رسوم - ${modalData.customerName} - ${modalData.ticketNo}` : `${modalData.customerName} - ${modalData.ticketNo}`;
             
-            bodyText = `📋 بيانات العميل:\n========================================\n\n` + buildFormattedDataText(row, {
-                includeComplaint: true, complaintText: modalData.complaintText, includeRepairNotes: true, includeClosureNotes: true, includeEmails: false
-            });
+            // ✅ النص المختصر + ملاحظات الإغلاق بس
+            bodyText = buildImportantDataText(row, { includeClosureNotes: true });
         }
 
         const subject = encodeURIComponent(subjectLine);
@@ -342531,7 +342530,7 @@
     function copyCardDataImportant(realIndex) {
         const row = customersDatabase[realIndex];
         if (!row) return;
-        // ✅ استخدام الدالة المخصصة للنسخ فقط
+        // ✅ النص المختصر فقط (بدون ملاحظات الإغلاق)
         let textToCopy = buildImportantDataText(row);
         function showSuccessState() {
             const card = document.getElementById(`card-${realIndex}`);
