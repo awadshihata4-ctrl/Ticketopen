@@ -225,7 +225,7 @@
 
     <!-- ===== التبويب الأول: صفحة البلاغات ===== -->
     <div id="tabReports" class="tab-content active">
-        <div class="header-date">تاريخ تحديث النظام: <span id="generationDate">2026-10-19 (الساعة 13:22)</span></div>
+        <div class="header-date">تاريخ تحديث النظام: <span id="generationDate">2026-10-19 (الساعة 14:12)</span></div>
         <h2>منظومة الاستعلام الآمن وعرض بلاغات العملاء</h2>
 
         <div class="admin-card" id="adminPanel" style="display: block;">
@@ -357575,6 +357575,8 @@
         if (hasValue(row["col7"]))  text += `رقم البلاغ: #${row["col7"]}\n`;
         if (hasValue(row["col17"])) text += `نوع الإصلاح: ${row["col17"]}\n`;
         if (hasValue(row["col12"])) text += `حالة الإصلاح: ${row["col12"]}\n`;
+        // ✅ إضافة تاريخ الزيارة (Repair Sch) - جديد
+        if (hasValue(row["col10"])) text += `تاريخ الزيارة: ${row["col10"]}\n`;
         if (hasValue(row["col13"])) text += `القطاع: ${row["col13"]}\n`;
         if (hasValue(row["col18"])) text += `مركز الخدمة: ${row["col18"]}\n`;
 
