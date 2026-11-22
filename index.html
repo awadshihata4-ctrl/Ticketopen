@@ -5,260 +5,282 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&amp;display=swap">
 
     <style>
+        /* =========================================
+           نظام الألوان الجديد مع تركيز على الوضوح
+           ========================================= */
+        :root {
+            --bg-dark: #0b1120;           /* خلفية الشاشة داكنة جداً */
+            --bg-card: #1e293b;           /* خلفية البطاقات الرئيسية */
+            --bg-card-light: #334155;     /* خلفية الكروت الداخلية */
+            --bg-input: #0f172a;          /* خلفية حقول الكتابة */
+            
+            --text-main: #ffffff;         /* نص أساسي أبيض ناصع */
+            --text-sub: #e2e8f0;          /* نص فرعي واضح جداً */
+            --text-muted: #94a3b8;        /* نص خفيف للتفاصيل */
+            --border-color: #475569;      /* حدود أوضح */
+            
+            /* ألوان التدرجات (مطابقة للصورة) */
+            --grad-purple: linear-gradient(135deg, #a855f7 0%, #6b21a8 100%);
+            --grad-pink: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+            --grad-orange: linear-gradient(135deg, #f97316 0%, #c2410c 100%);
+            --grad-red: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            --grad-blue: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            --grad-indigo: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+            --grad-cyan: linear-gradient(135deg, #06b6d4 0%, #0e7490 100%);
+            --grad-green: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+        }
+
         * { box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-        body { background-color: #f4f6f9; margin: 0; padding: 15px 30px; color: #1e293b; }
+        body { background-color: var(--bg-dark); margin: 0; padding: 15px 30px; color: var(--text-main); }
         .container { max-width: 1400px; margin: 0 auto; }
 
-        .tabs-bar { background: #fff; border-radius: 12px 12px 0 0; border-bottom: 2px solid #e2e8f0; padding: 0 16px; display: flex; flex-wrap: wrap; gap: 2px; position: sticky; top: 0; z-index: 999; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 0; }
-        .tab-btn { padding: 14px 22px; font-size: 15px; font-weight: 700; color: #64748b; background: transparent; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.2s; white-space: nowrap; margin-bottom: -2px; }
-        .tab-btn:hover { color: #1e3a8a; background: #f8fafc; }
-        .tab-btn.active { color: #1e3a8a; border-bottom-color: #1e3a8a; background: #f8fafc; }
+        /* ===== شريط التبويبات ===== */
+        .tabs-bar { background: var(--bg-card); border-radius: 16px 16px 0 0; border-bottom: 2px solid var(--border-color); padding: 0 16px; display: flex; flex-wrap: wrap; gap: 2px; position: sticky; top: 0; z-index: 999; box-shadow: 0 4px 20px rgba(0,0,0,0.4); margin-bottom: 0; }
+        .tab-btn { padding: 16px 24px; font-size: 16px; font-weight: 800; color: var(--text-muted); background: transparent; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.25s; white-space: nowrap; margin-bottom: -2px; }
+        .tab-btn:hover { color: var(--text-main); background: rgba(255,255,255,0.05); }
+        .tab-btn.active { color: #fff; border-bottom-color: #a855f7; background: rgba(168, 85, 247, 0.15); }
 
-        .tab-content { display: none; background: #fff; border-radius: 0 0 12px 12px; padding: 24px 28px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; border-top: none; }
+        .tab-content { display: none; background: var(--bg-card); border-radius: 0 0 16px 16px; padding: 24px 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-top: none; }
         .tab-content.active { display: block; }
 
-        .header-date { text-align: right; font-size: 13px; color: #64748b; font-weight: 600; margin-bottom: 25px; }
-        h2 { text-align: center; color: #1e3a8a; font-weight: 800; font-size: 26px; margin-top: 10px; margin-bottom: 35px; }
+        .header-date { text-align: right; font-size: 14px; color: var(--text-sub); font-weight: 700; margin-bottom: 25px; }
+        h2 { text-align: center; color: #fff; font-weight: 900; font-size: 28px; margin-top: 10px; margin-bottom: 35px; background: var(--grad-blue); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        .employee-card { background: #fff; padding: 30px 40px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); margin-bottom: 25px; border: 1px solid #e2e8f0; border-top: 5px solid #2563eb; }
+        /* ===== الكروت الرئيسية ===== */
+        .employee-card, .admin-card { background: var(--bg-card-light); padding: 30px 40px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); margin-bottom: 25px; border: 1px solid var(--border-color); border-top: 5px solid #3b82f6; }
+        .admin-card { border-top-color: #a855f7; }
+        
         .card-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
-        .card-header-row h3 { color: #1e3a8a; margin: 0; font-weight: 800; font-size: 19px; display: flex; align-items: center; gap: 8px; }
+        .card-header-row h3 { color: var(--text-main); margin: 0; font-weight: 800; font-size: 20px; display: flex; align-items: center; gap: 8px; }
 
-        .db-status { background-color: #e0f2fe; color: #0369a1; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+        .db-status { background-color: rgba(59, 130, 246, 0.2); color: #93c5fd; padding: 8px 16px; border-radius: 8px; font-size: 15px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(59, 130, 246, 0.4); }
 
+        /* ===== حقول البحث ===== */
         .search-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 25px; margin-bottom: 25px; }
         @media (max-width: 900px) { .search-grid { grid-template-columns: 1fr; } }
 
         .form-group { display: flex; flex-direction: column; }
-        .form-group label { font-size: 14px; font-weight: 800; margin-bottom: 12px; color: #1e293b; text-align: center; }
-        .form-group input { padding: 15px 20px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; outline: none; transition: all 0.2s; background-color: #f8fafc; text-align: center; color: #334155; font-weight: 600; width: 100%; }
-        .form-group input:focus { border-color: #2563eb; background-color: #fff; box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
+        .form-group label { font-size: 15px; font-weight: 800; margin-bottom: 12px; color: var(--text-sub); text-align: center; }
+        .form-group input { padding: 15px 20px; border: 2px solid var(--border-color); border-radius: 10px; font-size: 16px; outline: none; transition: all 0.2s; background-color: var(--bg-input); text-align: center; color: #fff; font-weight: 700; width: 100%; }
+        .form-group input:focus { border-color: #a855f7; box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.25); background-color: #000; }
 
-        .no-data { text-align: center; padding: 45px 20px; color: #64748b; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; font-size: 15px; font-weight: 600; margin-top: 15px; }
+        .no-data { text-align: center; padding: 45px 20px; color: var(--text-sub); background: var(--bg-input); border: 2px dashed var(--border-color); border-radius: 12px; font-size: 16px; font-weight: 700; margin-top: 15px; }
 
-        .admin-card { background: #fff; padding: 30px 40px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); margin-bottom: 25px; border: 1px solid #e2e8f0; border-top: 5px solid #1e3a8a; }
-        .admin-header { text-align: left; font-size: 18px; font-weight: 800; color: #1e3a8a; margin-bottom: 20px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+        /* ===== صندوق الرفع ===== */
+        .upload-box { background: var(--bg-input); border: 2px dashed #3b82f6; padding: 40px 20px; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.2s; margin-top: 15px; }
+        .upload-box:hover { background: rgba(59, 130, 246, 0.1); border-color: #60a5fa; }
+        .upload-box p { margin: 15px 0 0 0; font-size: 16px; color: var(--text-main); font-weight: 700; }
+        .upload-box-second { border-color: #a855f7; }
+        .upload-box-second:hover { background: rgba(168, 85, 247, 0.1); border-color: #c084fc; }
 
-        .upload-box { background: #fff; border: 2px dashed #2563eb; padding: 40px 20px; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.2s; margin-top: 15px; }
-        .upload-box:hover { background: #f8fafc; }
-        .upload-box p { margin: 15px 0 0 0; font-size: 15px; color: #334155; font-weight: 600; }
-        .upload-box-second { border-color: #8b5cf6; margin-top: 10px; }
-        .upload-box-second:hover { background: #f5f3ff; }
-
-        .save-btn { background-color: #10b981; color: white; margin-top: 20px; width: 100%; font-size: 17px; padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .save-btn:hover { background-color: #059669; }
+        .save-btn { color: white; margin-top: 20px; width: 100%; font-size: 18px; padding: 16px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
+        .save-btn:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 6px 15px rgba(0,0,0,0.4); }
+        .save-btn.blue { background: var(--grad-blue); }
+        .save-btn.purple { background: var(--grad-purple); }
 
         .pass-container { display: flex; gap: 10px; margin-bottom: 15px; max-width: 400px; margin-left: auto; }
-        .pass-container input { padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; flex: 1; text-align: right; }
-        .pass-container button { padding: 10px 20px; background: #1e3a8a; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .pass-container input { padding: 12px 15px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 15px; flex: 1; text-align: right; background: var(--bg-input); color: #fff; font-weight: 700; }
+        .pass-container button { padding: 10px 20px; background: var(--grad-blue); color: white; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 15px; }
         .admin-content { display: none; }
+        .admin-header { text-align: left; font-size: 18px; font-weight: 800; color: #c084fc; margin-bottom: 20px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+        .upload-section-title { font-weight: 800; color: var(--text-main); font-size: 17px; margin-top: 20px; margin-bottom: 10px; text-align: right; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; }
 
+        /* ===== كروت العملاء ===== */
         .results-container { margin-top: 15px; }
         .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 20px; display: none; }
 
-        .customer-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 22px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: all 0.2s; position: relative; overflow: hidden; padding-bottom: 110px; text-align: right; }
-        .customer-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.06); border-color: #bfdbfe; }
-        .customer-card::before { content: ''; position: absolute; top: 0; right: 0; width: 5px; height: 100%; background: #2563eb; }
+        .customer-card { background: var(--bg-input); border: 2px solid var(--border-color); border-radius: 16px; padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.25s; position: relative; overflow: hidden; padding-bottom: 110px; text-align: right; }
+        .customer-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.5); border-color: #a855f7; }
+        .customer-card::before { content: ''; position: absolute; top: 0; right: 0; width: 6px; height: 100%; background: var(--grad-blue); }
 
-        .card-header { font-size: 18px; font-weight: 800; color: #1e3a8a; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px dashed #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .card-header { font-size: 20px; font-weight: 900; color: #fff; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
 
-        .card-section-title { background: #f1f5f9; color: #1e3a8a; padding: 6px 12px; border-radius: 6px; font-size: 14px; font-weight: 800; margin-top: 15px; margin-bottom: 10px; border-right: 4px solid #2563eb; display: flex; justify-content: space-between; align-items: center; }
-        .card-section-title .section-en { font-size: 12px; color: #64748b; font-weight: 600; }
+        .card-section-title { background: rgba(255,255,255,0.08); color: #93c5fd; padding: 10px 14px; border-radius: 8px; font-size: 16px; font-weight: 800; margin-top: 18px; margin-bottom: 12px; border-right: 5px solid #3b82f6; display: flex; justify-content: space-between; align-items: center; }
+        .card-section-title .section-en { font-size: 13px; color: var(--text-muted); font-weight: 700; }
 
-        .info-grid { display: flex; flex-direction: column; gap: 4px; padding: 0 5px; }
-        .info-row { display: flex; align-items: baseline; font-size: 14px; border-bottom: 1px dashed #f1f5f9; padding: 3px 0; }
-        .info-label { font-weight: 700; color: #475569; white-space: nowrap; flex-shrink: 0; direction: ltr; text-align: left; margin-left: 8px; }
-        .info-value { font-weight: 700; color: #1e293b; word-break: break-word; direction: ltr; text-align: left; }
+        .info-grid { display: flex; flex-direction: column; gap: 6px; padding: 0 5px; }
+        .info-row { display: flex; align-items: baseline; font-size: 15px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding: 6px 0; }
+        .info-label { font-weight: 800; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; direction: ltr; text-align: left; margin-left: 10px; }
+        .info-value { font-weight: 800; color: var(--text-main); word-break: break-word; direction: ltr; text-align: left; font-size: 15px;}
 
-        .info-row-repair-type { background-color: #f3e8ff; border-right: 4px solid #8b5cf6; padding: 6px 10px; border-radius: 6px; margin: 4px 0; }
-        .info-row-repair-type .info-label { color: #6b21a8; }
-        .info-row-repair-type .info-value { color: #4c1d95; }
+        /* صفوف الألوان المميزة - تم فتح ألوانها لزيادة الوضوح */
+        .info-row-repair-type { background: rgba(168, 85, 247, 0.25); border-right: 5px solid #d8b4fe; padding: 10px 14px; border-radius: 8px; margin: 8px 0; }
+        .info-row-repair-type .info-label { color: #f3e8ff; }
+        .info-row-repair-type .info-value { color: #ffffff; font-size: 16px; }
 
-        .info-row-repair-status { background-color: #fef2f2; border-right: 4px solid #ef4444; padding: 6px 10px; border-radius: 6px; margin: 4px 0; }
-        .info-row-repair-status .info-label { color: #991b1b; }
-        .info-row-repair-status .info-value { color: #7f1d1d; }
+        .info-row-repair-status { background: rgba(239, 68, 68, 0.25); border-right: 5px solid #fca5a5; padding: 10px 14px; border-radius: 8px; margin: 8px 0; }
+        .info-row-repair-status .info-label { color: #fee2e2; }
+        .info-row-repair-status .info-value { color: #ffffff; font-size: 16px; }
 
-        .info-row-serial { background-color: #fffbeb; border-right: 4px solid #f59e0b; padding: 6px 10px; border-radius: 6px; margin: 4px 0; }
-        .info-row-serial .info-label { color: #92400e; }
-        .info-row-serial .info-value { color: #78350f; letter-spacing: 1px; }
+        .info-row-serial { background: rgba(234, 179, 8, 0.25); border-right: 5px solid #fde047; padding: 10px 14px; border-radius: 8px; margin: 8px 0; }
+        .info-row-serial .info-label { color: #fef08a; }
+        .info-row-serial .info-value { color: #ffffff; letter-spacing: 1px; font-size: 17px; }
 
-        .info-row-issue-date { background-color: #ecfeff; border-right: 4px solid #06b6d4; padding: 6px 10px; border-radius: 6px; margin: 4px 0; }
-        .info-row-issue-date .info-label { color: #155e75; }
-        .info-row-issue-date .info-value { color: #164e63; }
+        .info-row-issue-date { background: rgba(6, 182, 212, 0.25); border-right: 5px solid #67e8f9; padding: 10px 14px; border-radius: 8px; margin: 8px 0; }
+        .info-row-issue-date .info-label { color: #cffafe; }
+        .info-row-issue-date .info-value { color: #ffffff; font-size: 16px; }
 
-        .badge-days { background: #dbeafe; color: #1e40af; font-size: 12px; padding: 2px 8px; border-radius: 12px; margin-left: 6px; font-weight: 800; direction: rtl; display: inline-block; }
+        .badge-days { background: rgba(59, 130, 246, 0.5); color: #ffffff; font-size: 13px; padding: 3px 10px; border-radius: 12px; margin-left: 8px; font-weight: 900; direction: rtl; display: inline-block; border: 1px solid #60a5fa; }
 
-        .kpi-row { background-color: #f0fdf4; padding: 8px 12px; border-radius: 8px; border-right: 4px solid #10b981; margin-top: 8px; display: flex; align-items: center; justify-content: flex-start; gap: 8px; }
-        .kpi-label { color: #166534; font-weight: 800; white-space: nowrap; }
-        .kpi-value { color: #15803d; font-weight: 800; }
+        .kpi-row { background: rgba(34, 197, 94, 0.2); padding: 12px 16px; border-radius: 10px; border-right: 5px solid #4ade80; margin-top: 12px; display: flex; align-items: center; justify-content: flex-start; gap: 10px; }
+        .kpi-label { color: #86efac; font-weight: 800; white-space: nowrap; font-size: 15px;}
+        .kpi-value { color: #ffffff; font-weight: 900; font-size: 16px;}
 
-        .badge { background-color: #2563eb; color: white; padding: 3px 12px; border-radius: 6px; font-size: 13px; font-weight: 700; }
-        .badge-working { background-color: #fef3c7; color: #92400e; padding: 2px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; border: 1px solid #f59e0b; }
-        .badge-closed { background-color: #d1fae5; color: #065f46; padding: 2px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; border: 1px solid #10b981; }
+        .badge { background: var(--grad-blue); color: white; padding: 5px 16px; border-radius: 8px; font-size: 14px; font-weight: 800; box-shadow: 0 2px 8px rgba(59,130,246,0.4); }
+        .badge-working { background: rgba(234, 179, 8, 0.3); color: #fef08a; padding: 4px 14px; border-radius: 20px; font-size: 14px; font-weight: 800; border: 2px solid #eab308; }
+        .badge-closed { background: rgba(34, 197, 94, 0.3); color: #86efac; padding: 4px 14px; border-radius: 20px; font-size: 14px; font-weight: 800; border: 2px solid #22c55e; }
 
-        .complaint-area { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #e2e8f0; }
-        .complaint-area label { font-weight: 700; color: #1e3a8a; font-size: 14px; display: block; margin-bottom: 6px; text-align: right; }
-        .complaint-area textarea { width: 100%; min-height: 60px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; resize: vertical; background-color: #fcfcfc; transition: all 0.2s; }
-        .complaint-area textarea:focus { border-color: #2563eb; outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); background-color: #fff; }
+        .complaint-area { margin-top: 18px; padding-top: 18px; border-top: 2px dashed var(--border-color); }
+        .complaint-area label { font-weight: 800; color: #93c5fd; font-size: 16px; display: block; margin-bottom: 10px; text-align: right; }
+        .complaint-area textarea { width: 100%; min-height: 80px; padding: 14px; border: 2px solid var(--border-color); border-radius: 10px; font-size: 15px; resize: vertical; background-color: var(--bg-card); color: #fff; transition: all 0.2s; font-weight: 600; }
+        .complaint-area textarea:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 4px rgba(59,130,246,0.2); background-color: var(--bg-card-light); }
 
-        .closure-notes-area { margin-top: 14px; padding: 16px; background: linear-gradient(135deg,#faf5ff 0%,#f3e8ff 100%); border-radius: 12px; border: 1px solid #e9d5ff; box-shadow: 0 2px 8px rgba(139,92,246,0.08); }
-        .closure-notes-area .notes-title { font-weight: 800; color: #6d28d9; font-size: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; padding-bottom: 10px; border-bottom: 2px solid #e9d5ff; }
-        .closure-notes-area .notes-title .notes-count { background: #8b5cf6; color: white; padding: 2px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; }
-        .closure-notes-area .note-item { background: white; padding: 14px 18px; border-radius: 10px; border-right: 5px solid #8b5cf6; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); transition: all 0.2s; position: relative; }
+        /* ===== ملاحظات الإغلاق ===== */
+        .closure-notes-area { margin-top: 18px; padding: 20px; background: rgba(168, 85, 247, 0.1); border-radius: 14px; border: 2px solid rgba(168, 85, 247, 0.4); }
+        .closure-notes-area .notes-title { font-weight: 900; color: #d8b4fe; font-size: 17px; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; padding-bottom: 10px; border-bottom: 2px solid rgba(168, 85, 247, 0.4); }
+        .closure-notes-area .notes-title .notes-count { background: #a855f7; color: white; padding: 3px 14px; border-radius: 20px; font-size: 14px; font-weight: 800; box-shadow: 0 2px 6px rgba(168,85,247,0.4); }
+        .closure-notes-area .note-item { background: var(--bg-card-light); padding: 16px 20px; border-radius: 10px; border-right: 6px solid #a855f7; margin-bottom: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); position: relative; }
         .closure-notes-area .note-item:last-child { margin-bottom: 0; }
-        .closure-notes-area .note-item .note-text { color: #1e293b; font-weight: 600; font-size: 15px; line-height: 1.8; padding: 4px 0; white-space: pre-wrap; word-break: break-word; }
-        .closure-notes-area .note-item .note-meta { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e9d5ff; font-size: 13px; color: #64748b; font-weight: 600; }
-        .closure-notes-area .note-item .note-meta .meta-item { display: flex; align-items: center; gap: 5px; background: #f8fafc; padding: 2px 12px; border-radius: 6px; font-size: 12px; }
-        .closure-notes-area .note-item .note-meta .meta-item.meta-date { background: #f0f9ff; border: 1px solid #bae6fd; }
-        .closure-notes-area .note-item .note-meta .meta-item.meta-date .meta-value { color: #0369a1; }
-        .closure-notes-area .note-item .note-meta .meta-item.meta-user { background: #fef3c7; border: 1px solid #fde68a; }
-        .closure-notes-area .note-item .note-meta .meta-item.meta-user .meta-value { color: #92400e; }
-        .closure-notes-area .note-item .note-index { position: absolute; top: -8px; left: 10px; background: #8b5cf6; color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; box-shadow: 0 2px 6px rgba(139,92,246,0.3); }
-        .closure-notes-area .no-notes { color: #64748b; font-weight: 600; padding: 20px; text-align: center; background: white; border-radius: 8px; border: 1px dashed #cbd5e1; font-size: 14px; }
-        .closure-notes-area .no-notes .no-notes-icon { font-size: 24px; display: block; margin-bottom: 8px; }
+        .closure-notes-area .note-item .note-text { color: #ffffff; font-weight: 700; font-size: 15px; line-height: 1.8; white-space: pre-wrap; word-break: break-word; }
+        .closure-notes-area .note-item .note-meta { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; color: var(--text-muted); font-weight: 700; }
+        .closure-notes-area .note-item .note-meta .meta-item { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.1); padding: 4px 14px; border-radius: 8px; font-size: 13px; }
+        .closure-notes-area .note-item .note-meta .meta-item.meta-date { background: rgba(6, 182, 212, 0.2); border: 1px solid rgba(6, 182, 212, 0.5); color: #67e8f9; }
+        .closure-notes-area .note-item .note-meta .meta-item.meta-user { background: rgba(234, 179, 8, 0.2); border: 1px solid rgba(234, 179, 8, 0.5); color: #fde047; }
+        .closure-notes-area .note-item .note-index { position: absolute; top: -10px; left: 12px; background: #a855f7; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; box-shadow: 0 2px 6px rgba(168,85,247,0.5); }
+        .closure-notes-area .no-notes { color: var(--text-sub); font-weight: 700; padding: 20px; text-align: center; background: var(--bg-card-light); border-radius: 10px; border: 2px dashed var(--border-color); font-size: 15px; }
 
-        .action-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; padding-top: 12px; border-top: 1px solid #e2e8f0; justify-content: flex-start; }
-        .action-btn { background-color: #f1f5f9; color: #1e3a8a; border: 1px solid #cbd5e1; padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; user-select: none; white-space: nowrap; }
-        .action-btn:hover { background-color: #e2e8f0; border-color: #94a3b8; }
-        .action-btn.copied { background-color: #d1fae5; color: #065f46; border-color: #a7f3d0; }
-        .action-btn.send-btn { background-color: #2563eb; color: white; border-color: #2563eb; }
-        .action-btn.send-btn:hover { background-color: #1d4ed8; }
-        .action-btn.canal-btn { background-color: #8b5cf6; color: white; border-color: #8b5cf6; }
-        .action-btn.canal-btn:hover { background-color: #7c3aed; border-color: #7c3aed; }
-        .action-btn.reports-btn { background-color: #f59e0b; color: white; border-color: #f59e0b; }
-        .action-btn.reports-btn:hover { background-color: #d97706; border-color: #d97706; }
-        .action-btn.complaint-btn { background-color: #dc2626; color: white; border-color: #dc2626; }
-        .action-btn.complaint-btn:hover { background-color: #b91c1c; border-color: #b91c1c; }
-        .important-copy-btn { background-color: #8b5cf6 !important; color: white !important; border-color: #8b5cf6 !important; }
-        .important-copy-btn:hover { background-color: #7c3aed !important; border-color: #7c3aed !important; }
-        .important-copy-btn.copied { background-color: #d1fae5 !important; color: #065f46 !important; border-color: #a7f3d0 !important; }
-        .support-btn { background-color: #0891b2 !important; color: white !important; border-color: #0891b2 !important; }
-        .support-btn:hover { background-color: #0e7490 !important; border-color: #0e7490 !important; }
-        .fees-btn { background-color: #dc2626 !important; color: white !important; border-color: #dc2626 !important; }
-        .fees-btn:hover { background-color: #b91c1c !important; border-color: #b91c1c !important; }
-        .cancel-ticket-btn { background-color: #7c3aed !important; color: white !important; border-color: #7c3aed !important; }
-        .cancel-ticket-btn:hover { background-color: #6d28d9 !important; border-color: #6d28d9 !important; }
+        /* ===== أزرار الإجراءات ===== */
+        .action-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; padding-top: 18px; border-top: 2px solid var(--border-color); justify-content: flex-start; }
+        .action-btn { color: white; border: none; padding: 10px 18px; border-radius: 8px; font-size: 14px; font-weight: 800; cursor: pointer; transition: all 0.2s; user-select: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+        .action-btn:hover { transform: translateY(-2px); filter: brightness(1.2); box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+        
+        .action-btn.important-copy-btn { background: var(--grad-purple); }
+        .action-btn.complaint-btn { background: var(--grad-red); }
+        .action-btn.send-btn { background: var(--grad-blue); }
+        .action-btn.canal-btn { background: var(--grad-indigo); }
+        .action-btn.reports-btn { background: var(--grad-orange); }
+        .action-btn.cancel-ticket-btn { background: var(--grad-pink); }
+        .action-btn.support-btn { background: var(--grad-cyan); }
+        .action-btn.fees-btn { background: var(--grad-red); }
+        .action-btn.copied { background: var(--grad-green) !important; }
 
-        .card-footer { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+        /* ===== المودال ===== */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(11, 17, 32, 0.9); display: none; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(5px); }
+        .modal-box { background: var(--bg-card-light); border: 2px solid var(--border-color); border-radius: 16px; padding: 30px 40px; max-width: 600px; width: 95%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.8); max-height: 90vh; overflow-y: auto; border-top: 6px solid #3b82f6; }
+        .modal-box h3 { color: #fff; margin-bottom: 20px; font-size: 24px; font-weight: 900; }
+        .modal-actions { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 25px; }
+        .modal-actions button { padding: 14px 30px; border-radius: 10px; font-size: 16px; font-weight: 800; cursor: pointer; border: none; transition: all 0.2s; color: #fff; }
+        .modal-actions .btn-copy { background: var(--grad-purple); }
+        .modal-actions .btn-send { background: var(--grad-blue); }
+        .modal-actions .btn-cancel { background: #475569; color: #f8fafc; }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 9999; }
-        .modal-box { background: white; border-radius: 16px; padding: 30px 40px; max-width: 550px; width: 95%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; }
-        .modal-box h3 { color: #1e3a8a; margin-bottom: 20px; font-size: 22px; }
-        .modal-actions { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
-        .modal-actions button { padding: 12px 30px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s; }
-        .modal-actions .btn-copy { background-color: #8b5cf6; color: white; }
-        .modal-actions .btn-copy:hover { background-color: #7c3aed; }
-        .modal-actions .btn-send { background-color: #2563eb; color: white; }
-        .modal-actions .btn-send:hover { background-color: #1d4ed8; }
-        .modal-actions .btn-cancel { background-color: #e2e8f0; color: #475569; }
-        .modal-actions .btn-cancel:hover { background-color: #cbd5e1; }
-
-        .quick-form { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 14px; padding: 25px; margin-top: 20px; display: none; }
+        /* ===== النموذج السريع ===== */
+        .quick-form { background: var(--bg-input); border: 2px solid var(--border-color); border-radius: 14px; padding: 25px; margin-top: 20px; display: none; }
         .quick-form.active { display: block; }
         .quick-form .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .quick-form .form-row input, .quick-form .form-row textarea { padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; width: 100%; background: white; }
-        .quick-form .form-row textarea { grid-column: 1 / -1; min-height: 80px; resize: vertical; }
-        .quick-form .form-row label { font-weight: 700; color: #1e293b; font-size: 14px; display: flex; flex-direction: column; gap: 6px; text-align: right; }
-        .quick-form .quick-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; justify-content: center; }
-        .quick-form .quick-actions .action-btn { font-size: 14px; padding: 8px 18px; }
+        .quick-form .form-row input, .quick-form .form-row textarea { padding: 14px 16px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 15px; width: 100%; background: var(--bg-card-light); color: #fff; font-weight: 700; }
+        .quick-form .form-row input:focus, .quick-form .form-row textarea:focus { border-color: #a855f7; outline: none; box-shadow: 0 0 0 4px rgba(168,85,247,0.2); background: var(--bg-card); }
+        .quick-form .form-row textarea { grid-column: 1 / -1; min-height: 90px; resize: vertical; }
+        .quick-form .form-row label { font-weight: 800; color: var(--text-sub); font-size: 15px; display: flex; flex-direction: column; gap: 8px; text-align: right; }
+        .quick-form .quick-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; justify-content: center; }
 
-        .repair-notes-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; background-color: #f8fafc; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; display: none; }
+        /* ===== جدول الملاحظات ===== */
+        .repair-notes-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; background-color: var(--bg-card); border-radius: 10px; overflow: hidden; border: 2px solid var(--border-color); display: none; }
         .repair-notes-table.show { display: table; }
-        .repair-notes-table th { background-color: #1e3a8a; color: white; padding: 8px 12px; text-align: center; font-weight: 700; font-size: 14px; }
-        .repair-notes-table td { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; vertical-align: top; line-height: 1.6; }
+        .repair-notes-table th { background: var(--grad-blue); color: white; padding: 12px; text-align: center; font-weight: 800; font-size: 15px; border: none; }
+        .repair-notes-table td { padding: 14px; border-bottom: 1px solid var(--border-color); vertical-align: top; line-height: 1.7; color: #fff; font-weight: 600; }
 
-        .upload-section-title { font-weight: 700; color: #1e293b; font-size: 16px; margin-top: 20px; margin-bottom: 10px; text-align: right; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+        /* ===== Handling Scripts ===== */
+        .handling-container .section-title { font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--border-color); }
+        .handling-container .scripts { display: flex; flex-direction: column; gap: 12px; }
+        .handling-container .script-card { display: flex; align-items: flex-start; gap: 15px; background: var(--bg-card-light); border: 2px solid var(--border-color); border-radius: 12px; padding: 18px 20px; transition: all 0.2s; border-right: 6px solid #3b82f6; }
+        .handling-container .script-card:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.4); border-right-color: #a855f7; transform: translateX(-4px); }
+        .handling-container .script-text { flex: 1; font-size: 16px; font-weight: 700; color: #fff; line-height: 1.8; white-space: pre-wrap; word-break: break-word; }
+        .handling-container .btn-copy-script { flex-shrink: 0; display: flex; align-items: center; gap: 6px; padding: 10px 18px; background: var(--grad-blue); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 800; cursor: pointer; transition: all 0.2s; white-space: nowrap; min-width: 80px; justify-content: center; }
+        .handling-container .btn-copy-script:hover { filter: brightness(1.2); transform: translateY(-2px); }
+        .handling-container .btn-copy-script.copied { background: var(--grad-green); }
 
-        .debug-info { background: #f1f5f9; padding: 12px 16px; border-radius: 8px; margin-top: 10px; font-size: 13px; color: #475569; direction: ltr; text-align: left; max-height: 200px; overflow-y: auto; display: none; border: 1px solid #e2e8f0; }
-        .debug-info.show { display: block; }
-        .debug-info .debug-title { font-weight: 700; color: #1e3a8a; margin-bottom: 6px; direction: rtl; }
+        .handling-top-bar { background: var(--grad-indigo); color: #fff; padding: 16px 26px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.5); border-radius: 16px 16px 0 0; margin-bottom: 20px; }
+        .handling-top-bar img { width: 50px; height: 50px; border-radius: 8px; background: #fff; padding: 4px; }
+        .handling-top-bar .title { font-size: 20px; font-weight: 900; flex: 1; }
+        .handling-top-bar .serial-wrap { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .handling-top-bar .serial-wrap input { padding: 10px 16px; border: 2px solid rgba(255,255,255,.4); border-radius: 8px; background: rgba(0,0,0,.3); color: #fff; font-size: 15px; font-weight: 700; width: 180px; outline: none; text-transform: uppercase; }
+        .handling-top-bar .serial-wrap input::placeholder { color: rgba(255,255,255,.7); }
+        .handling-top-bar .serial-wrap input:focus { border-color: #fff; background: rgba(0,0,0,.5); box-shadow: 0 0 0 3px rgba(255,255,255,0.2); }
+        .handling-top-bar #issue-date { font-size: 14px; color: #fff; min-width: 90px; font-weight: 700; }
+        .handling-top-bar .btn-wa { display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: #25d366; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 800; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+        .handling-top-bar .btn-wa:hover { background: #1ebe5d; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(37, 211, 102, 0.4); }
+        .handling-top-bar .btn-wa:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+        .handling-top-bar .clock { font-size: 14px; color: rgba(255,255,255,.9); white-space: nowrap; margin-right: auto; font-weight: 700; }
 
-        .ct-iframe-container { width: 100%; height: 80vh; min-height: 600px; border: none; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .ct-container { padding: 0; }
-        .ct-container .ct-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #e2e8f0; }
-        .ct-container .ct-header h3 { color: #1e3a8a; font-weight: 800; font-size: 20px; margin: 0; }
-        .ct-container .ct-header .ct-badge { background: #2563eb; color: white; padding: 4px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; }
-
-        .handling-container .section-title { font-size: 20px; font-weight: 700; color: #1f3c88; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid #e2e8f0; }
-        .handling-container .scripts { display: flex; flex-direction: column; gap: 8px; }
-        .handling-container .script-card { display: flex; align-items: flex-start; gap: 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; transition: box-shadow 0.15s; }
-        .handling-container .script-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
-        .handling-container .script-text { flex: 1; font-size: 15px; font-weight: 600; color: #1e293b; line-height: 1.75; white-space: pre-wrap; word-break: break-word; }
-        .handling-container .btn-copy-script { flex-shrink: 0; display: flex; align-items: center; gap: 5px; padding: 7px 14px; background: #1f3c88; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s; white-space: nowrap; min-width: 64px; justify-content: center; }
-        .handling-container .btn-copy-script:hover { background: #162d6a; }
-        .handling-container .btn-copy-script.copied { background: #16a34a; }
-
-        .handling-top-bar { background: #1f3c88; color: #fff; padding: 14px 24px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,.25); border-radius: 12px 12px 0 0; margin-bottom: 20px; }
-        .handling-top-bar img { width: 44px; height: 44px; border-radius: 8px; background: #fff; padding: 3px; }
-        .handling-top-bar .title { font-size: 18px; font-weight: 700; flex: 1; }
-        .handling-top-bar .serial-wrap { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .handling-top-bar .serial-wrap input { padding: 7px 12px; border: 2px solid rgba(255,255,255,.3); border-radius: 8px; background: rgba(255,255,255,.1); color: #fff; font-size: 13px; width: 160px; outline: none; text-transform: uppercase; }
-        .handling-top-bar .serial-wrap input::placeholder { color: rgba(255,255,255,.5); }
-        .handling-top-bar .serial-wrap input:focus { border-color: rgba(255,255,255,.7); background: rgba(255,255,255,.15); }
-        .handling-top-bar #issue-date { font-size: 12px; color: rgba(255,255,255,.75); min-width: 80px; }
-        .handling-top-bar .btn-wa { display: flex; align-items: center; gap: 6px; padding: 7px 14px; background: #25d366; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-        .handling-top-bar .btn-wa:hover { background: #1ebe5d; }
-        .handling-top-bar .btn-wa:disabled { opacity: .4; cursor: not-allowed; }
-        .handling-top-bar .clock { font-size: 13px; color: rgba(255,255,255,.6); white-space: nowrap; margin-right: auto; }
-
-        .handling-tabs-bar { background: #fff; border-bottom: 2px solid #e2e8f0; padding: 0 16px; display: flex; flex-wrap: wrap; gap: 2px; position: sticky; top: 73px; z-index: 99; border-radius: 0 0 12px 12px; margin-bottom: 20px; }
-        .handling-tabs-bar .tab-btn { padding: 12px 18px; font-size: 13px; font-weight: 700; color: #64748b; background: transparent; border: none; border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap; margin-bottom: -2px; }
-        .handling-tabs-bar .tab-btn:hover { color: #1f3c88; background: #f8fafc; }
-        .handling-tabs-bar .tab-btn.active { color: #1f3c88; border-bottom-color: #1f3c88; }
+        .handling-tabs-bar { background: var(--bg-card-light); border-bottom: 2px solid var(--border-color); padding: 0 16px; display: flex; flex-wrap: wrap; gap: 4px; position: sticky; top: 82px; z-index: 99; border-radius: 0 0 14px 14px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .handling-tabs-bar .tab-btn { padding: 14px 20px; font-size: 14px; font-weight: 800; color: var(--text-muted); background: transparent; border: none; border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap; margin-bottom: -2px; }
+        .handling-tabs-bar .tab-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .handling-tabs-bar .tab-btn.active { color: #fff; border-bottom-color: #a855f7; background: rgba(168, 85, 247, 0.15); }
 
         .handling-tab-content { display: none; padding: 0; }
         .handling-tab-content.active { display: block; }
 
-        .sms-page { --blue:#0b4f9c; --blue-dark:#083a73; --blue-light:#e8f1fb; --accent:#19a7ce; --green:#1f9d63; --red:#d64545; --card:#ffffff; --text:#1c2a3a; --muted:#6b7a8c; --border:#dde5ef; font-family: 'Almarai', Tahoma, sans-serif; direction: rtl; color: var(--text); }
+        /* ===== SMS Page ===== */
+        .sms-page { --blue:#3b82f6; --blue-dark:#1d4ed8; --blue-light:rgba(59,130,246,0.15); --accent:#a855f7; --green:#22c55e; --red:#ef4444; --card:var(--bg-card-light); --text:#ffffff; --muted:#cbd5e1; --border:var(--border-color); font-family: 'Almarai', Tahoma, sans-serif; direction: rtl; color: var(--text); }
         .sms-page .topbar-inner { max-width: 1180px; margin: 0 auto; display: flex; align-items: center; justify-content: center; gap: 18px; flex-wrap: wrap; }
-        .sms-page .logo-wrap { background: #fff; border-radius: 16px; padding: 8px 14px; display: flex; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,.15); }
-        .sms-page .logo-wrap img { height: 56px; width: auto; display: block; }
-        .sms-page .topbar h1 { margin: 0; font-size: 22px; font-weight: 800; color: var(--blue-dark); }
+        .sms-page .logo-wrap { background: #fff; border-radius: 16px; padding: 8px 14px; display: flex; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,.4); }
+        .sms-page .logo-wrap img { height: 60px; width: auto; display: block; }
+        .sms-page .topbar h1 { margin: 0; font-size: 24px; font-weight: 900; color: #fff; }
         .sms-page .wrap { max-width: 1180px; margin: 24px auto; padding: 0 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .sms-page .wrap > section:last-child { position: sticky; top: 16px; align-self: start; }
         @media(max-width:860px) { .sms-page .wrap { grid-template-columns: 1fr; } .sms-page .wrap > section:last-child { position: static; } }
-        .sms-page .card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 22px; box-shadow: 0 6px 20px rgba(20,50,90,.06); }
-        .sms-page .card h2 { margin: 0 0 16px; font-size: 17px; font-weight: 800; color: var(--blue-dark); }
-        .sms-page .tabs { display: flex; gap: 8px; background: var(--blue-light); padding: 6px; border-radius: 14px; margin-bottom: 20px; }
-        .sms-page .tab { flex: 1; border: 0; background: transparent; font-weight: 800; font-size: 14px; padding: 12px 8px; border-radius: 10px; cursor: pointer; color: var(--blue); transition: .2s; }
-        .sms-page .tab.active { background: var(--blue); color: #fff; box-shadow: 0 4px 12px rgba(11,79,156,.35); }
-        .sms-page .btn { font-weight: 800; font-size: 14px; border: 0; border-radius: 12px; padding: 11px 18px; cursor: pointer; color: #fff; transition: .15s; }
-        .sms-page .btn:hover { transform: translateY(-1px); filter: brightness(1.07); }
-        .sms-page .btn-primary { background: var(--blue); }
-        .sms-page .btn-danger { background: var(--red); }
-        .sms-page .btn-success { background: var(--green); }
-        .sms-page .btn-block { width: 100%; padding: 14px; font-size: 15px; }
+        .sms-page .card { background: var(--card); border: 2px solid var(--border); border-radius: 18px; padding: 24px; box-shadow: 0 6px 20px rgba(0,0,0,.3); border-top: 6px solid #a855f7; }
+        .sms-page .card h2 { margin: 0 0 16px; font-size: 19px; font-weight: 900; color: #fff; background: none; -webkit-text-fill-color: #fff; }
+        .sms-page .tabs { display: flex; gap: 8px; background: var(--bg-input); padding: 8px; border-radius: 14px; margin-bottom: 20px; border: 2px solid var(--border); }
+        .sms-page .tab { flex: 1; border: 0; background: transparent; font-weight: 800; font-size: 15px; padding: 14px 8px; border-radius: 10px; cursor: pointer; color: var(--muted); transition: .2s; }
+        .sms-page .tab.active { background: var(--grad-purple); color: #fff; box-shadow: 0 4px 12px rgba(168,85,247,.4); }
+        .sms-page .btn { font-weight: 800; font-size: 15px; border: 0; border-radius: 12px; padding: 14px 22px; cursor: pointer; color: #fff; transition: all 0.2s; }
+        .sms-page .btn:hover { transform: translateY(-2px); filter: brightness(1.15); box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+        .sms-page .btn-primary { background: var(--grad-blue); }
+        .sms-page .btn-danger { background: var(--grad-red); }
+        .sms-page .btn-success { background: var(--grad-green); }
+        .sms-page .btn-block { width: 100%; padding: 16px; font-size: 16px; }
         .sms-page .actions { display: flex; gap: 10px; margin-bottom: 18px; }
-        .sms-page .form-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; padding: 10px 12px; background: #f8fafd; border: 1px solid var(--border); border-radius: 12px; }
-        .sms-page .form-group label { background: var(--blue); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; margin: 0; }
-        .sms-page .zerial-input { font-size: 15px; width: 220px; height: 40px; padding: 0 12px; border: 1px solid var(--border); border-radius: 10px; direction: ltr; text-align: left; outline: none; color: var(--text); background: #fff; }
-        .sms-page .zerial-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(25,167,206,.2); }
-        .sms-page .issue-date { margin: 0; font-size: 12px; color: var(--muted); }
-        .sms-page #customerDetails { display: none; margin-top: 16px; padding: 14px; border: 1px dashed var(--accent); border-radius: 12px; background: #f2fbfe; }
-        .sms-page #customerDetails div { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; }
-        .sms-page #customerDetails input { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; background: #fff; }
-        .sms-page .maint-info { display: none; background: var(--blue-light); border-radius: 14px; padding: 16px; font-size: 14px; line-height: 1.9; color: var(--blue-dark); margin-top: 18px; }
+        .sms-page .form-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; padding: 12px; background: var(--bg-input); border: 2px solid var(--border); border-radius: 12px; }
+        .sms-page .form-group label { background: var(--grad-purple); color: #fff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; margin: 0; box-shadow: 0 2px 6px rgba(168,85,247,0.5); }
+        .sms-page .zerial-input { font-size: 16px; width: 220px; height: 44px; padding: 0 14px; border: 2px solid var(--border); border-radius: 10px; direction: ltr; text-align: left; outline: none; color: #fff; background: var(--bg-card-light); font-weight: 700; }
+        .sms-page .zerial-input:focus { border-color: #a855f7; box-shadow: 0 0 0 3px rgba(168,85,247,.25); background: #000; }
+        .sms-page .issue-date { margin: 0; font-size: 13px; color: var(--muted); font-weight: 700; }
+        .sms-page #customerDetails { display: none; margin-top: 16px; padding: 16px; border: 2px dashed #a855f7; border-radius: 12px; background: rgba(168,85,247,0.1); }
+        .sms-page #customerDetails div { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 14px; color: #fff; font-weight: 700; }
+        .sms-page #customerDetails input { flex: 1; border: 2px solid var(--border); border-radius: 8px; padding: 10px; background: var(--bg-card-light); color: #fff; font-weight: 700; }
+        .sms-page .maint-info { display: none; background: rgba(59,130,246,0.15); border: 2px solid rgba(59,130,246,0.4); border-radius: 14px; padding: 16px; font-size: 15px; line-height: 1.9; color: #bfdbfe; margin-top: 18px; font-weight: 700; }
         .sms-page .maint-info ul { margin: 8px 0 0; padding-right: 20px; }
-        .sms-page #copyTextBox { width: 100%; min-height: 380px; resize: vertical; padding: 16px; border: 1px solid var(--border); border-radius: 14px; background: #f8fafd; font-size: 14px; line-height: 1.9; color: var(--text); outline: none; margin-bottom: 14px; direction: rtl; text-align: right; }
-        .sms-page .toast { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(30px); background: var(--green); color: #fff; padding: 12px 24px; border-radius: 30px; font-weight: 800; opacity: 0; pointer-events: none; transition: .3s; box-shadow: 0 6px 20px rgba(0,0,0,.2); z-index: 99999; }
+        .sms-page #copyTextBox { width: 100%; min-height: 380px; resize: vertical; padding: 18px; border: 2px solid var(--border); border-radius: 14px; background: var(--bg-input); font-size: 16px; line-height: 2; color: #fff; outline: none; margin-bottom: 14px; direction: rtl; text-align: right; font-weight: 600; }
+        .sms-page #copyTextBox:focus { border-color: #a855f7; box-shadow: 0 0 0 3px rgba(168,85,247,.2); background: #000; }
+        .sms-page .toast { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(30px); background: var(--grad-green); color: #fff; padding: 16px 32px; border-radius: 30px; font-weight: 900; font-size: 16px; opacity: 0; pointer-events: none; transition: all .3s; box-shadow: 0 8px 24px rgba(34,197,94,.5); z-index: 99999; }
         .sms-page .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-        .sms-page .signature { position: fixed; bottom: 14px; left: 16px; direction: ltr; background: rgba(255,255,255,.95); color: var(--blue-dark); font-weight: 800; font-size: 12px; padding: 8px 16px; border-radius: 30px; box-shadow: 0 4px 14px rgba(0,0,0,.2); z-index: 50; letter-spacing: .3px; }
-        .sms-page footer { text-align: center; color: #64748b; font-size: 12px; padding: 10px 0 60px; }
+        .sms-page .signature { position: fixed; bottom: 14px; left: 16px; direction: ltr; background: var(--grad-purple); color: #fff; font-weight: 900; font-size: 13px; padding: 10px 20px; border-radius: 30px; box-shadow: 0 4px 16px rgba(168,85,247,.5); z-index: 50; letter-spacing: .3px; }
+        .sms-page footer { text-align: center; color: var(--muted); font-size: 14px; font-weight: 700; padding: 10px 0 60px; }
+
+        /* ===== CT Portal ===== */
+        .ct-iframe-container { width: 100%; height: 80vh; min-height: 600px; border: 2px solid var(--border-color); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); background: #fff; }
+        .ct-container { padding: 0; }
+        .ct-container .ct-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid var(--border-color); }
+        .ct-container .ct-header h3 { color: #fff; font-weight: 900; font-size: 22px; margin: 0; }
+        .ct-container .ct-header .ct-badge { background: var(--grad-blue); color: white; padding: 5px 16px; border-radius: 20px; font-size: 14px; font-weight: 800; box-shadow: 0 2px 8px rgba(59,130,246,0.5); }
+        .ct-container .ct-header span { color: var(--text-sub) !important; font-weight: 700; }
 
         @media (max-width: 900px) {
             body { padding: 10px 12px; }
             .tab-content { padding: 16px; }
             .tabs-bar { padding: 0 8px; }
-            .tab-btn { padding: 10px 14px; font-size: 13px; }
+            .tab-btn { padding: 12px 16px; font-size: 14px; }
             .employee-card, .admin-card { padding: 16px 18px; }
             .results-grid { grid-template-columns: 1fr; }
             .search-grid { grid-template-columns: 1fr; gap: 12px; }
-            .handling-top-bar { padding: 10px 14px; gap: 10px; }
-            .handling-tabs-bar .tab-btn { padding: 10px 14px; font-size: 12px; }
+            .handling-top-bar { padding: 12px 14px; gap: 10px; }
+            .handling-tabs-bar .tab-btn { padding: 12px 14px; font-size: 13px; }
             .ct-iframe-container { height: 60vh; min-height: 400px; }
         }
     </style>
@@ -273,7 +295,7 @@
 
     <!-- ===== التبويب الأول: البلاغات ===== -->
     <div id="tabReports" class="tab-content active">
-        <div class="header-date">تاريخ تحديث النظام: <span id="generationDate">2026-11-22 (الساعة 13:10)</span></div>
+        <div class="header-date">تاريخ تحديث النظام: <span id="generationDate">2026-11-22 (الساعة 16:07)</span></div>
         <h2>منظومة الاستعلام الآمن وعرض بلاغات العملاء</h2>
 
         <div class="admin-card" id="adminPanel" style="display: block;">
@@ -283,15 +305,15 @@
                 <button onclick="checkPassword()">دخول</button>
             </div>
             <div class="admin-content" id="adminContent" style="display: block;">
-                <div style="text-align: right; color: #475569; font-weight: 600; font-size: 15px; margin-bottom: 10px;">مرحباً بك يا Awad.</div>
+                <div style="text-align: right; color: #cbd5e1; font-weight: 700; font-size: 16px; margin-bottom: 10px;">مرحباً بك يا Awad.</div>
                 <div class="upload-section-title">📊 الشيت الأول: البيانات الأساسية للبلاغات</div>
                 <div class="upload-box" onclick="document.getElementById('excelFile').click()">
-                    <p id="uploadText"><span style="color:#10b981; font-weight:bold;">✓</span> تم تحميل 6886 سجل فريد.</p>
+                    <p id="uploadText"><span style="color:#22c55e; font-weight:900;">✓</span> تم تحميل 6886 سجل فريد.</p>
                     <input type="file" id="excelFile" accept=".xlsx, .xls" style="display:none;" onchange="processExcel(event)">
                 </div>
                 <div class="upload-section-title" style="margin-top:25px;">📝 الشيت الثاني: ملاحظات إغلاق البلاغات</div>
                 <div class="upload-box upload-box-second" onclick="document.getElementById('closureExcelFile').click()">
-                    <p id="closureUploadText"><span style="color:#8b5cf6; font-weight:bold;">✓</span> تم تحميل 11439 ملاحظة إغلاق.</p>
+                    <p id="closureUploadText"><span style="color:#a855f7; font-weight:900;">✓</span> تم تحميل 11439 ملاحظة إغلاق.</p>
                     <input type="file" id="closureExcelFile" accept=".xlsx, .xls" style="display:none;" onchange="processClosureExcel(event)">
                 </div>
                 <div id="debugInfo" class="debug-info">
@@ -299,10 +321,10 @@
                     <div id="debugContent"></div>
                 </div>
                 <div style="display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap;">
-                    <button id="saveEmployeesBtn" class="save-btn" style="display: block; flex: 1 1 0%; min-width: 250px; background-color: rgb(37, 99, 235);" onclick="exportEmployeesFile()">
+                    <button id="saveEmployeesBtn" class="save-btn blue" style="display: block; flex: 1 1 0%; min-width: 250px;" onclick="exportEmployeesFile()">
                         💾 تصدير ملف الموظفين (بلاغات + CT)
                     </button>
-                    <button id="saveWhatsappBtn" class="save-btn" style="display: block; flex: 1 1 0%; min-width: 250px; background-color: rgb(139, 92, 246);" onclick="exportWhatsappFile()">
+                    <button id="saveWhatsappBtn" class="save-btn purple" style="display: block; flex: 1 1 0%; min-width: 250px;" onclick="exportWhatsappFile()">
                         💾 تصدير ملف الواتس اب (4 تبويبات)
                     </button>
                 </div>
@@ -311,7 +333,7 @@
 
         <div class="employee-card" id="employeePanel" style="display: none;">
             <div class="card-header-row">
-                <div id="dbCounter" class="db-status"><span style="color:#10b981; font-weight:bold;">✓</span> النظام جاهز: 6886 سجل + 11439 ملاحظة إغلاق</div>
+                <div id="dbCounter" class="db-status"><span style="color:#22c55e; font-weight:900;">✓</span> النظام جاهز: 6886 سجل + 11439 ملاحظة إغلاق</div>
                 <h3>🔍 استعلام الموظفين السريع</h3>
             </div>
             <div class="search-box">
@@ -324,7 +346,7 @@
                 </div>
             </div>
             <div class="quick-form active" id="quickForm">
-                <h4 style="text-align:center;color:#1e3a8a;margin-bottom:15px;">📝 ارسال ميل لبلاغ مقفول (جميع القطاعات)</h4>
+                <h4 style="text-align:center;color:#fff;margin-bottom:15px;font-size:20px;font-weight:900;">📝 ارسال ميل لبلاغ مقفول (جميع القطاعات)</h4>
                 <div class="form-row">
                     <label>اسم العميل <input type="text" id="qfName" placeholder="أدخل اسم العميل"></label>
                     <label>رقم البلاغ <input type="text" id="qfTicket" placeholder="أدخل رقم البلاغ"></label>
@@ -346,7 +368,7 @@
         <div class="ct-header">
             <h3>🌐 CT Portal — منصة إدارة العملاء</h3>
             <span class="ct-badge">🔗 مباشر</span>
-            <span style="font-size:13px;color:#64748b;margin-right:auto;">رابط: unionaire.com/ct</span>
+            <span style="font-size:14px;margin-right:auto;">رابط: unionaire.com/ct</span>
         </div>
         <iframe class="ct-iframe-container" src="https://unionaire.com/ct/" title="CT Portal" allow="microphone; camera; clipboard-read; clipboard-write" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
     </div>
@@ -356,7 +378,7 @@
 <div class="modal-overlay" id="actionModal">
     <div class="modal-box">
         <h3 id="modalTitle">📧 إرسال البلاغ</h3>
-        <div id="modalMessage">اختر الإجراء المناسب:</div>
+        <div id="modalMessage" style="color: #cbd5e1; font-size: 15px; font-weight: 600; line-height: 1.8;">اختر الإجراء المناسب:</div>
         <div class="modal-actions">
             <button class="btn-copy" onclick="modalCopy()">📋 نسخ البيانات والإيميلات</button>
             <button class="btn-send" onclick="modalSend()">✉️ إرسال إيميل</button>
@@ -259569,7 +259591,6 @@
         const info = emailMap[dept];
         if (!info) return [];
         if (dept === 'تقارير واعتراضات') return [BACKOFFICE_CC];
-        // قسم إلغاء بلاغ له CC مخصص (بدون تكرار BackOffice)
         if (dept === 'إلغاء بلاغ') return [...new Set(info.cc || [])];
         const ccList = [BACKOFFICE_CC];
         if (info.cc) info.cc.forEach(e => { if (!ccList.includes(e)) ccList.push(e); });
@@ -259609,7 +259630,7 @@
                 if (isReportType) return;
                 if (detectedDept && !['اللوجيستك','الاستبدالات','قطع الغيار','الشكاوي','ورشة المجمع','الكول سنتر','مدن القناه','تقارير واعتراضات','الدعم الفني','شكوي ضد موظف متابعه او فني صيانة','شكوي ضد موظف كول سنتر','تحصيل رسوم'].includes(detectedDept)) {
                     const isCanal = (detectedDept === 'مدن القناه');
-                    buttons.push({ dept: detectedDept, label: `📧 ${detectedDept}`, className: isCanal ? 'action-btn canal-btn' : 'action-btn send-btn', style: isCanal ? '' : 'background-color:#059669;border-color:#059669;' });
+                    buttons.push({ dept: detectedDept, label: `📧 ${detectedDept}`, className: isCanal ? 'action-btn canal-btn' : 'action-btn send-btn', style: isCanal ? '' : '' });
                 }
             } else if (part === 'ورشة المجمع') buttons.push({ dept: 'ورشة المجمع', label: '📧 ورشة المجمع', className: 'action-btn send-btn', style: '' });
             else if (part === 'الاستبدالات') buttons.push({ dept: 'الاستبدالات', label: '📧 الاستبدالات', className: 'action-btn send-btn', style: '' });
@@ -259667,14 +259688,12 @@
                 const btn = document.createElement('button');
                 if (dept === 'شكوي ضد موظف متابعه او فني صيانة' || dept === 'شكوي ضد موظف كول سنتر') btn.className = 'action-btn complaint-btn';
                 else if (dept === 'الدعم الفني') btn.className = 'action-btn support-btn';
-                // تم إلغاء زر تحصيل الرسوم من هنا
                 else if (dept === 'تقارير واعتراضات') btn.className = 'action-btn reports-btn';
                 else btn.className = 'action-btn send-btn';
                 let label = dept;
                 if (dept === 'شكوي ضد موظف متابعه او فني صيانة') label = '⚠️ شكوي ضد موظف متابعة أو فني صيانة';
                 else if (dept === 'شكوي ضد موظف كول سنتر') label = '⚠️ شكوي ضد موظف كول سنتر';
                 else if (dept === 'الدعم الفني') label = '🛠️ الدعم الفني';
-                // تم إلغاء ليبل تحصيل الرسوم من هنا
                 else if (dept === 'تقارير واعتراضات') label = '📋 تقارير واعتراضات';
                 else label = '📧 ' + dept;
                 btn.textContent = label;
@@ -259704,21 +259723,21 @@
         modalData = { isQuick: true, dept, toList: toList.join(';'), ccList: ccList.join(';'), customerName: name, ticketNo: ticket, quickData: { name, ticket, center, serial, complaint }, complaintText: complaint, index: null };
         document.getElementById('modalTitle').innerHTML = `📧 ${dept} - بيانات البلاغ`;
         document.getElementById('modalMessage').innerHTML = `
-            <div style="text-align:right;">
-                <strong>👤 اسم العميل:</strong> ${name}<br>
-                <strong>🎫 رقم البلاغ:</strong> ${ticket}<br>
-                <strong>🏢 المركز:</strong> ${center}<br>
-                <strong>🔢 الرقم التسلسلي:</strong> ${serial}<br>
-                <strong>📝 الشكوى:</strong> ${complaint}<br><br>
-                <span style="font-size:14px;color:#64748b;">To: ${modalData.toList}</span><br>
-                <span style="font-size:14px;color:#64748b;">CC: ${modalData.ccList}</span>
+            <div style="text-align:right; color:#e2e8f0; font-size: 15px; line-height: 1.8;">
+                <strong style="color:#fff;">👤 اسم العميل:</strong> ${name}<br>
+                <strong style="color:#fff;">🎫 رقم البلاغ:</strong> ${ticket}<br>
+                <strong style="color:#fff;">🏢 المركز:</strong> ${center}<br>
+                <strong style="color:#fff;">🔢 الرقم التسلسلي:</strong> ${serial}<br>
+                <strong style="color:#fff;">📝 الشكوى:</strong> ${complaint}<br><br>
+                <span style="font-size:13px;color:#94a3b8;">To: ${modalData.toList}</span><br>
+                <span style="font-size:13px;color:#94a3b8;">CC: ${modalData.ccList}</span>
             </div>`;
         document.getElementById('actionModal').style.display = 'flex';
     }
 
     function updateStatusCounter() {
         const c = document.getElementById('dbCounter');
-        c.innerHTML = `<span style="color:#10b981; font-weight:bold;">✓</span> النظام جاهز: ${customersDatabase.length} سجل + ${closureNotesDatabase.length} ملاحظة إغلاق`;
+        c.innerHTML = `<span style="color:#22c55e; font-weight:900;">✓</span> النظام جاهز: ${customersDatabase.length} سجل + ${closureNotesDatabase.length} ملاحظة إغلاق`;
     }
 
     function calculateDaysDifference(targetDateStr) {
@@ -259824,7 +259843,7 @@
             includeComplaint: true,
             complaintText: modalData.complaintText
         });
-        document.getElementById('modalMessage').innerHTML = `<div style="text-align:right; font-size:13px; line-height:1.8; color:#1e293b; white-space:pre-wrap;">${preview}\n\n📧 القسم: ${dept}\nTo: ${modalData.toList}\nCC: ${modalData.ccList}</div>`;
+        document.getElementById('modalMessage').innerHTML = `<div style="text-align:right; font-size:14px; line-height:1.9; color:#e2e8f0; white-space:pre-wrap; font-weight: 600;">${preview}\n\n📧 القسم: ${dept}\nTo: ${modalData.toList}\nCC: ${modalData.ccList}</div>`;
         document.getElementById('actionModal').style.display = 'flex';
     }
 
@@ -259938,7 +259957,7 @@
             customersDatabase.length = 0;
             unique.forEach(r => customersDatabase.push(r));
             newlyUploadedJSON = customersDatabase;
-            document.getElementById('uploadText').innerHTML = `<span style="color:#10b981; font-weight:bold;">✓</span> تم تحميل ${unique.length} سجل فريد.`;
+            document.getElementById('uploadText').innerHTML = `<span style="color:#22c55e; font-weight:900;">✓</span> تم تحميل ${unique.length} سجل فريد.`;
             checkAndShowSaveButton();
             updateStatusCounter();
         };
@@ -259989,7 +260008,7 @@
                 }
                 newlyUploadedClosureJSON = dataRows;
                 closureNotesDatabase = dataRows;
-                document.getElementById('closureUploadText').innerHTML = `<span style="color:#8b5cf6; font-weight:bold;">✓</span> تم تحميل ${dataRows.length} ملاحظة إغلاق.`;
+                document.getElementById('closureUploadText').innerHTML = `<span style="color:#a855f7; font-weight:900;">✓</span> تم تحميل ${dataRows.length} ملاحظة إغلاق.`;
                 checkAndShowSaveButton();
                 if (customersDatabase.length > 0) liveSearch();
                 updateStatusCounter();
@@ -260135,7 +260154,7 @@
                     if (notesMap[repairType] !== undefined) matched = notesMap[repairType];
                     else for (let k in notesMap) { if (repairType.includes(k) || k.includes(repairType)) { matched = notesMap[k]; break; } }
                     if (!matched) matched = '⚠️ لا توجد ملاحظات مسجلة لهذا النوع';
-                    bodyHTML += `<div style="margin-top:10px;padding-top:10px;border-top:1px dashed #e2e8f0;"><table class="repair-notes-table show"><tr><th colspan="2">📌 ملاحظات نوع الإصلاح: ${repairType}</th></tr><tr><td style="padding:10px 14px;white-space:pre-wrap;">${matched}</td></tr></table></div>`;
+                    bodyHTML += `<div style="margin-top:14px;padding-top:14px;border-top:2px dashed var(--border-color);"><table class="repair-notes-table show"><tr><th colspan="2">📌 ملاحظات نوع الإصلاح: ${repairType}</th></tr><tr><td style="padding:14px;white-space:pre-wrap;">${matched}</td></tr></table></div>`;
                 }
 
                 if (hasClosureNotes) {
@@ -260165,11 +260184,11 @@
 
                 if (isSparePartReq) {
                     if (isNeedTL || isWaitCenter) {
-                        if (detectedDept) { const isCanal = (detectedDept === 'مدن القناه'); dyn.push({ dept: detectedDept, label: `📧 ${detectedDept}`, className: isCanal?'action-btn canal-btn':'action-btn send-btn', style: isCanal?'':'background-color:#059669;border-color:#059669;' }); }
+                        if (detectedDept) { const isCanal = (detectedDept === 'مدن القناه'); dyn.push({ dept: detectedDept, label: `📧 ${detectedDept}`, className: isCanal?'action-btn canal-btn':'action-btn send-btn', style: '' }); }
                     } else dyn.push({ dept: 'قطع الغيار', label: '📧 قطع الغيار', className: 'action-btn send-btn', style: '' });
                 } else {
                     if (isNeedTL) {
-                        if (detectedDept) { const isCanal = (detectedDept === 'مدن القناه'); dyn.push({ dept: detectedDept, label: `📧 ${detectedDept}`, className: isCanal?'action-btn canal-btn':'action-btn send-btn', style: isCanal?'':'background-color:#059669;border-color:#059669;' }); }
+                        if (detectedDept) { const isCanal = (detectedDept === 'مدن القناه'); dyn.push({ dept: detectedDept, label: `📧 ${detectedDept}`, className: isCanal?'action-btn canal-btn':'action-btn send-btn', style: '' }); }
                     } else dyn = getActionButtonsFromRepairType(repairType, detectedDept);
                 }
                 dyn.forEach(b => { ab += `<button class="${b.className}" onclick="openModal(${realIndex}, '${b.dept}')" style="${b.style}">${b.label}</button>`; });
@@ -260215,20 +260234,14 @@
         const dbJSON = JSON.stringify(newlyUploadedJSON, null, 4);
         const closureJSON = JSON.stringify(newlyUploadedClosureJSON || [], null, 4);
 
-        // ننسخ الـ HTML ونحذف تبويبي Handling وSMS منه
         let html = document.documentElement.outerHTML;
 
-        // حذف أزرار التبويبات من الشريط
         html = html.replace(/[ \t]*<button class="tab-btn"[^>]*data-tab="tabHandling"[^>]*>[^<]*<\/button>\s*/g, '');
         html = html.replace(/[ \t]*<button class="tab-btn"[^>]*data-tab="tabSMS"[^>]*>[^<]*<\/button>\s*/g, '');
 
-        // حذف محتوى تبويب Handling (من <div id="tabHandling" لحد قبل <div id="tabSMS")
         html = html.replace(/<div id="tabHandling"[\s\S]*?(?=<div id="tabSMS")/, '');
-
-        // حذف محتوى تبويب SMS (من <div id="tabSMS" لحد قبل <div id="tabCT")
         html = html.replace(/<div id="tabSMS"[\s\S]*?(?=<div id="tabCT")/, '');
 
-        // تحديث التاريخ والبيانات
         html = html.replace(
             '<span id="generationDate">2026-07-18 (الساعة 12:00)</span>',
             `<span id="generationDate">${currentDateStr}</span>`
